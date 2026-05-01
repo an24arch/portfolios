@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300;1,600&family=Azeret+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f9f5ef;
+    --card: #ffffff;
+    --ink: #1c1812;
+    --muted: #9a9287;
+    --border: #e8e0d4;
+    --accent: #c94f1e;
+    --soft: #f0ebe2;
+    --green: #3d7a5c;
+    --line: rgba(28,24,18,0.08);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Azeret Mono', monospace;
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+
+  .container { max-width: 520px; margin: 0 auto; }
+
+  /* Header */
+  .top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .date-display {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .streak {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 6px;
+    animation: fadeUp 0.5s 0.05s ease both;
+  }
+
+  .sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 32px;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 12px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .card:nth-child(1) { animation-delay: 0.15s; }
+  .card:nth-child(2) { animation-delay: 0.2s; }
+  .card:nth-child(3) { animation-delay: 0.25s; }
+  .card:nth-child(4) { animation-delay: 0.3s; }
+
+  .card-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Session type toggle */
+  .toggle-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 10px 8px;
+    background: var(--soft);
+    border: 1.5px solid transparent;
+    font-family: 'Azeret Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .toggle-btn.active {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  /* Project select */
+  .project-select {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .proj-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    background: var(--soft);
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-size: 11px;
+    color: var(--ink);
+  }
+
+  .proj-opt:hover { border-color: var(--border); }
+  .proj-opt.selected { border-color: var(--accent); background: rgba(201,79,30,0.05); }
+
+  .proj-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.12s;
+  }
+
+  .proj-opt.selected .proj-dot { background: var(--accent); }
+
+  .proj-name {
+    flex: 1;
+    font-size: 11px;
+  }
+
+  .proj-empty {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  /* Textarea */
+  .field {
+    width: 100%;
+    background: var(--soft);
+    border: 1.5px solid var(--border);
+    padding: 12px;
+    font-family: 'Azeret Mono', monospace;
+    font-size: 11px;
+    color: var(--ink);
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color 0.15s;
+  }
+
+  .field:focus { border-color: var(--ink); }
+  .field::placeholder { color: var(--muted); }
+
+  /* Time tracker */
+  .time-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .time-btn {
+    width: 36px; height: 36px;
+    background: var(--soft);
+    border: 1.5px solid var(--border);
+    font-family: 'Azeret Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+    flex-shrink: 0;
+  }
+
+  .time-btn:hover { background: var(--border); }
+
+  .time-display {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  .time-unit {
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* Energy */
+  .energy-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .energy-btn {
+    flex: 1;
+    padding: 8px 4px;
+    background: var(--soft);
+    border: 1.5px solid transparent;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.12s;
+    border-radius: 1px;
+  }
+
+  .energy-btn.selected { border-color: var(--ink); background: white; }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    font-family: 'Azeret Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s;
+    animation: fadeUp 0.5s 0.35s ease both;
+  }
+
+  .submit-btn:hover { background: var(--accent); }
+
+  /* Share card */
+  .share-section {
+    display: none;
+    margin-top: 24px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .share-section.visible { display: block; }
+
+  .share-card {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 24px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .share-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+    transform: translate(20px, -20px);
+  }
+
+  .share-eyebrow {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(249,245,239,0.4);
+    margin-bottom: 16px;
+  }
+
+  .share-main {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    font-weight: 300;
+    line-height: 1.55;
+    margin-bottom: 20px;
+  }
+
+  .share-main strong {
+    font-weight: 600;
+    color: white;
+  }
+
+  .share-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .share-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .share-stat-num {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .share-stat-label {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(249,245,239,0.4);
+  }
+
+  .share-bar {
+    margin-top: 16px;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+  }
+
+  .share-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.6s ease;
+  }
+
+  .share-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(249,245,239,0.35);
+    margin-top: 5px;
+  }
+
+  .copy-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    font-family: 'Azeret Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  /* Log */
+  .log-section {
+    margin-top: 40px;
+    animation: fadeUp 0.5s 0.4s ease both;
+  }
+
+  .log-title {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .log-empty {
+    font-size: 10.5px;
+    color: var(--muted);
+    font-style: italic;
+    padding: 16px 0;
+    font-family: 'Fraunces', serif;
+  }
+
+  .log-entry {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .log-entry-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+
+  .log-entry-date {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .log-entry-time {
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .log-entry-project {
+    font-size: 10px;
+    color: var(--ink);
+    margin-bottom: 3px;
+    font-weight: 500;
+  }
+
+  .log-entry-note {
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    font-family: 'Azeret Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0;
+    margin-top: 6px;
+    transition: color 0.12s;
+    display: block;
+  }
+
+  .delete-btn:hover { color: var(--accent); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="top">
+    <span class="date-display" id="dateDisplay"></span>
+    <span class="streak" id="streakDisplay"></span>
+  </div>
+
+  <h1>Today's<br><em>session.</em></h1>
+  <p class="sub">Log it. Then share the part that matters.</p>
+
+  <!-- SESSION TYPE -->
+  <div class="card">
+    <div class="card-label">Session type</div>
+    <div class="toggle-row">
+      <button class="toggle-btn active" onclick="selectType(this, 'morning')">Morning</button>
+      <button class="toggle-btn" onclick="selectType(this, 'evening')">Evening</button>
+      <button class="toggle-btn" onclick="selectType(this, 'lunch')">Lunch</button>
+    </div>
+  </div>
+
+  <!-- PROJECT -->
+  <div class="card">
+    <div class="card-label">Working on</div>
+    <div class="project-select" id="projectSelect">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- TIME -->
+  <div class="card">
+    <div class="card-label">Time spent</div>
+    <div class="time-row">
+      <button class="time-btn" onclick="adjustTime(-30)">−</button>
+      <div style="text-align:center;flex:1">
+        <div class="time-display" id="timeDisplay">60</div>
+        <div class="time-unit">minutes</div>
+      </div>
+      <button class="time-btn" onclick="adjustTime(30)">+</button>
+    </div>
+  </div>
+
+  <!-- WHAT YOU DID -->
+  <div class="card">
+    <div class="card-label">What you actually did</div>
+    <textarea class="field" id="sessionNote" rows="3"
+      placeholder="e.g. finished asset inventory for project 2, started UI layout..."></textarea>
+  </div>
+
+  <!-- ENERGY -->
+  <div class="card">
+    <div class="card-label">Energy going in</div>
+    <div class="energy-row">
+      <button class="energy-btn selected" onclick="selectEnergy(this, 1)" title="low">😴</button>
+      <button class="energy-btn" onclick="selectEnergy(this, 2)" title="okay">😐</button>
+      <button class="energy-btn" onclick="selectEnergy(this, 3)" title="good">🙂</button>
+      <button class="energy-btn" onclick="selectEnergy(this, 4)" title="locked in">🔥</button>
+    </div>
+  </div>
+
+  <button class="submit-btn" onclick="logSession()">→ Log session</button>
+
+  <!-- SHARE SECTION -->
+  <div class="share-section" id="shareSection">
+    <div class="share-card" id="shareCard">
+      <div class="share-eyebrow">Portfolio sprint · May 2026</div>
+      <div class="share-main" id="shareMain"></div>
+      <div class="share-meta" id="shareMeta"></div>
+      <div class="share-bar">
+        <div class="share-bar-fill" id="shareBarFill"></div>
+      </div>
+      <div class="share-bar-label">
+        <span>Sprint progress</span>
+        <span id="shareBarPct"></span>
+      </div>
+    </div>
+    <button class="copy-btn" id="copyBtn" onclick="copyShare()">Copy to send to him →</button>
+  </div>
+
+  <!-- SESSION LOG -->
+  <div class="log-section">
+    <div class="log-title">
+      <span>Session log</span>
+      <span id="totalHours">0 hrs this month</span>
+    </div>
+    <div id="logList">
+      <div class="log-empty">No sessions yet. First one counts.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // State — all in-memory
+  let sessionType = 'morning';
+  let selectedProject = null;
+  let minutes = 60;
+  let energy = 1;
+  let log = [];
+
+  const defaultProjects = ['Project 1','Project 2','Project 3','Project 4','Project 5'];
+  let projectNames = [...defaultProjects];
+
+  function getProjects() {
+    return projectNames;
+  }
+
+  // Date
+  const now = new Date();
+  document.getElementById('dateDisplay').textContent =
+    now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+
+  // Streak
+  function calcStreak() {
+    if (!log.length) return 0;
+    const dates = [...new Set(log.map(e => e.date))].sort().reverse();
+    let streak = 0;
+    let check = new Date();
+    for (let d of dates) {
+      const diff = Math.round((check - new Date(d)) / 86400000);
+      if (diff <= 1) { streak++; check = new Date(d); }
+      else break;
+    }
+    return streak;
+  }
+
+  function updateStreak() {
+    const s = calcStreak();
+    document.getElementById('streakDisplay').textContent = s > 0 ? `${s} day streak 🔥` : '';
+  }
+
+  // Project select
+  function renderProjects() {
+    const projects = getProjects();
+    const el = document.getElementById('projectSelect');
+    el.innerHTML = projects.map((p, i) => `
+      <div class="proj-opt ${selectedProject === i ? 'selected' : ''}" onclick="selectProject(${i})">
+        <div class="proj-dot"></div>
+        <span class="proj-name">${p || `<span class="proj-empty">Unnamed project ${i+1}</span>`}</span>
+      </div>
+    `).join('');
+  }
+
+  function selectProject(i) {
+    selectedProject = i;
+    renderProjects();
+  }
+
+  function selectType(btn, type) {
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sessionType = type;
+  }
+
+  function adjustTime(delta) {
+    minutes = Math.max(15, Math.min(240, minutes + delta));
+    document.getElementById('timeDisplay').textContent = minutes;
+  }
+
+  function selectEnergy(btn, val) {
+    document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    energy = val;
+  }
+
+  // Log
+  function logSession() {
+    const note = document.getElementById('sessionNote').value.trim();
+    if (selectedProject === null) { alert('Pick a project first.'); return; }
+    if (!note) { alert('Write what you actually did.'); return; }
+
+    const projects = getProjects();
+    const entry = {
+      date: now.toISOString().split('T')[0],
+      time: now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}),
+      type: sessionType,
+      project: projects[selectedProject] || `Project ${selectedProject+1}`,
+      minutes,
+      energy,
+      note
+    };
+
+    log.unshift(entry);
+
+    renderLog();
+    buildShareCard(entry);
+    updateStreak();
+    document.getElementById('sessionNote').value = '';
+  }
+
+  function renderLog() {
+    const el = document.getElementById('logList');
+    if (!log.length) {
+      el.innerHTML = '<div class="log-empty">No sessions yet. First one counts.</div>';
+      document.getElementById('totalHours').textContent = '0 hrs this month';
+      return;
+    }
+
+    const totalMins = log.reduce((s, e) => s + e.minutes, 0);
+    document.getElementById('totalHours').textContent =
+      `${(totalMins/60).toFixed(1)} hrs logged`;
+
+    el.innerHTML = log.slice(0, 10).map((e, i) => `
+      <div class="log-entry">
+        <div class="log-entry-top">
+          <span class="log-entry-date">${e.date} · ${e.time} · ${e.type}</span>
+          <span class="log-entry-time">${e.minutes}m</span>
+        </div>
+        <div class="log-entry-project">${e.project}</div>
+        <div class="log-entry-note">${e.note}</div>
+        <button class="delete-btn" onclick="deleteEntry(${i})">× delete</button>
+      </div>
+    `).join('');
+  }
+
+  function deleteEntry(i) {
+    log.splice(i, 1);
+    renderLog();
+    updateStreak();
+  }
+
+  function buildShareCard(entry) {
+    const energyWords = ['','low energy but showed up','okay energy','good energy','locked in 🔥'];
+    const totalMins = log.reduce((s, e) => s + e.minutes, 0);
+    const totalHrs = (totalMins / 60).toFixed(1);
+    const sessions = log.length;
+
+    // Rough sprint progress (15 tasks = 100%)
+    const pct = Math.min(100, Math.round((totalMins / 4200) * 100)); // ~70hrs = 4200min
+
+    document.getElementById('shareMain').innerHTML =
+      `<strong>${entry.project}</strong> — ${entry.note}. ${energyWords[entry.energy]}.`;
+
+    document.getElementById('shareMeta').innerHTML = `
+      <div class="share-stat">
+        <span class="share-stat-num">${entry.minutes}m</span>
+        <span class="share-stat-label">Today</span>
+      </div>
+      <div class="share-stat">
+        <span class="share-stat-num">${totalHrs}h</span>
+        <span class="share-stat-label">Total logged</span>
+      </div>
+      <div class="share-stat">
+        <span class="share-stat-num">${sessions}</span>
+        <span class="share-stat-label">Sessions</span>
+      </div>
+    `;
+
+    document.getElementById('shareBarFill').style.width = pct + '%';
+    document.getElementById('shareBarPct').textContent = pct + '% of sprint';
+
+    document.getElementById('shareSection').classList.add('visible');
+
+    // Store share text
+    window._shareText =
+      `portfolio sprint · ${entry.date}\n` +
+      `${entry.project} — ${entry.note}\n` +
+      `${entry.minutes} min · ${totalHrs}h total · ${pct}% through the sprint`;
+  }
+
+  function copyShare() {
+    if (!window._shareText) return;
+    navigator.clipboard.writeText(window._shareText).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy to send to him →';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Init
+  renderProjects();
+  renderLog();
+  updateStreak();
+</script>
+</body>
+</html>
