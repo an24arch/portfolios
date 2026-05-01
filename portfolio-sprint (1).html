@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Sprint — May 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inconsolata:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --border: #2a2a2a;
+    --text: #e8e3dc;
+    --muted: #5a5a5a;
+    --accent: #e05a2b;
+    --green: #4a9e6e;
+    --yellow: #d4a847;
+    --dim: #2e2e2e;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inconsolata', monospace;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+
+  .container { max-width: 660px; margin: 0 auto; }
+
+  /* Header */
+  header {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 6vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 12px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Rule */
+  .rule {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* Week blocks */
+  .week {
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .week:nth-child(2) { animation-delay: 0.1s; }
+  .week:nth-child(3) { animation-delay: 0.2s; }
+  .week:nth-child(4) { animation-delay: 0.3s; }
+  .week:nth-child(5) { animation-delay: 0.4s; }
+
+  .week-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .week-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .week-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .week-dates {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-left: auto;
+  }
+
+  .tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s, opacity 0.15s;
+    user-select: none;
+  }
+
+  .task:hover { border-left-color: var(--accent); }
+
+  .task.done {
+    opacity: 0.35;
+    border-left-color: var(--green) !important;
+  }
+
+  .task.done .task-text { text-decoration: line-through; }
+
+  .task-box {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--muted);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: var(--green);
+    transition: border-color 0.15s;
+  }
+
+  .task.done .task-box { border-color: var(--green); }
+
+  .task-body { flex: 1; }
+
+  .task-text {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .task-sub {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .task-tag {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 1px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .tag-existing { background: rgba(74,158,110,0.15); color: var(--green); }
+  .tag-new { background: rgba(224,90,43,0.15); color: var(--accent); }
+  .tag-frame { background: rgba(212,168,71,0.15); color: var(--yellow); }
+  .tag-finish { background: rgba(100,100,200,0.15); color: #9999dd; }
+
+  /* Project tracker */
+  .projects {
+    margin-top: 40px;
+    margin-bottom: 32px;
+  }
+
+  .projects-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .project-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .project-num {
+    font-size: 10px;
+    color: var(--muted);
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .project-name-input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'Inconsolata', monospace;
+    font-size: 11.5px;
+    flex: 1;
+    outline: none;
+    padding: 0;
+  }
+
+  .project-name-input::placeholder { color: var(--dim); }
+
+  .project-status {
+    display: flex;
+    gap: 4px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .dot.active { border-color: transparent; }
+  .dot[data-stage="0"].active { background: var(--dim); }
+  .dot[data-stage="1"].active { background: var(--accent); }
+  .dot[data-stage="2"].active { background: var(--yellow); }
+  .dot[data-stage="3"].active { background: var(--green); }
+
+  .dot-label {
+    font-size: 8px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  .stage-labels {
+    display: flex;
+    gap: 4px;
+    padding-left: 32px;
+    margin-bottom: 8px;
+  }
+
+  .stage-label {
+    width: 8px;
+    font-size: 8px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0;
+  }
+
+  /* accountability box */
+  .accountability {
+    margin-top: 40px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .acc-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .acc-rule {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    align-items: baseline;
+  }
+
+  .acc-when {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    width: 72px;
+    flex-shrink: 0;
+  }
+
+  .acc-what {
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .acc-what strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* progress */
+  .overall-progress {
+    margin-top: 32px;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .op-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .op-bar {
+    height: 3px;
+    background: var(--border);
+  }
+
+  .op-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <p class="eyebrow">Portfolio Sprint</p>
+    <h1>30 days.<br>5 projects.<br>No excuses.</h1>
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-num">31</span>
+        <span class="stat-label">Days left</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">5</span>
+        <span class="stat-label">Projects</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">~70</span>
+        <span class="stat-label">Hours available</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="donePct">0%</span>
+        <span class="stat-label">Complete</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- PROJECT TRACKER -->
+  <div class="projects">
+    <div class="projects-title">Your 5 projects — name them + track stage</div>
+    <div class="stage-labels">
+      <div style="width:20px"></div>
+      <div style="flex:1"></div>
+      <div style="display:flex;gap:4px">
+        <div class="stage-label" style="width:14px">—</div>
+        <div class="stage-label" style="width:14px">🔥</div>
+        <div class="stage-label" style="width:14px">⚡</div>
+        <div class="stage-label" style="width:14px">✓</div>
+      </div>
+    </div>
+    <div id="projectList">
+      <!-- generated by JS -->
+    </div>
+  </div>
+
+  <div class="rule"></div>
+
+  <!-- WEEK 1 -->
+  <div class="week">
+    <div class="week-header">
+      <span class="week-label">Week 1</span>
+      <span class="week-title">Audit + plan every project</span>
+      <span class="week-dates">May 1–7</span>
+    </div>
+    <div class="tasks" id="tasks-w1">
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">List every asset you already have for each project — drawings, photos, process work, anything</div>
+          <div class="task-sub">Don't edit yet. Just inventory. 1 doc, 5 sections.</div>
+        </div>
+        <span class="task-tag tag-existing">existing</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Decide which 2 projects need new work made from scratch</div>
+          <div class="task-sub">Be ruthless. New work = diagrams, UI mockups, process maps. Not full redesigns.</div>
+        </div>
+        <span class="task-tag tag-new">new</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Write 2 sentences for each project: what problem it solves + why it belongs in an urban design MSD portfolio</div>
+          <div class="task-sub">This is your framing. Everything else serves these sentences.</div>
+        </div>
+        <span class="task-tag tag-frame">framing</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Pick one project as the UI/UX bridge piece — the one that shows urban design ↔ tech</div>
+          <div class="task-sub">This is your Penn/Columbia differentiator. Needs the most attention.</div>
+        </div>
+        <span class="task-tag tag-frame">framing</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK 2 -->
+  <div class="week">
+    <div class="week-header">
+      <span class="week-label">Week 2</span>
+      <span class="week-title">Build the new work</span>
+      <span class="week-dates">May 8–14</span>
+    </div>
+    <div class="tasks">
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">New project 1 — rough assets done (diagrams, mockups, maps)</div>
+          <div class="task-sub">Not polished. Just: does this work exist? Yes or no.</div>
+        </div>
+        <span class="task-tag tag-new">new</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">New project 2 — rough assets done</div>
+          <div class="task-sub">Same bar. Rough is fine. Done is the goal.</div>
+        </div>
+        <span class="task-tag tag-new">new</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">UI/UX bridge project — first full draft layout in Figma or equivalent</div>
+          <div class="task-sub">This one needs to look intentional, not just competent.</div>
+        </div>
+        <span class="task-tag tag-new">new</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Existing projects (3) — curate and cut assets down to only what serves the framing</div>
+          <div class="task-sub">Less is more. 6 strong images beats 20 mediocre ones.</div>
+        </div>
+        <span class="task-tag tag-existing">existing</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK 3 -->
+  <div class="week">
+    <div class="week-header">
+      <span class="week-label">Week 3</span>
+      <span class="week-title">Layout + sequence all 5</span>
+      <span class="week-dates">May 15–21</span>
+    </div>
+    <div class="tasks">
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">All 5 projects have a complete rough layout — images placed, text written, structure clear</div>
+          <div class="task-sub">Ugly is fine. The point is: every page exists.</div>
+        </div>
+        <span class="task-tag tag-frame">layout</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Write the project descriptions — 100–150 words each, past tense, active voice</div>
+          <div class="task-sub">What you did, what it was for, what it proves about you.</div>
+        </div>
+        <span class="task-tag tag-frame">writing</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Decide on portfolio order — lead with your strongest, end with the UI/UX piece or vice versa</div>
+          <div class="task-sub">First and last projects are what they remember.</div>
+        </div>
+        <span class="task-tag tag-frame">framing</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Get one outside eye on the draft — send to someone who will actually tell you what's not working</div>
+          <div class="task-sub">Not your bf. A peer, mentor, or anyone in design.</div>
+        </div>
+        <span class="task-tag tag-frame">feedback</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK 4 -->
+  <div class="week">
+    <div class="week-header">
+      <span class="week-label">Week 4</span>
+      <span class="week-title">Polish + lock it</span>
+      <span class="week-dates">May 22–31</span>
+    </div>
+    <div class="tasks">
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Visual consistency pass — fonts, margins, image sizes, color palette locked across all projects</div>
+          <div class="task-sub">It should look like one person made all of it.</div>
+        </div>
+        <span class="task-tag tag-finish">polish</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Write the intro / about page — who you are, what you're after, why urban design + tech</div>
+          <div class="task-sub">3–5 sentences max. This is your thesis statement as a person.</div>
+        </div>
+        <span class="task-tag tag-finish">writing</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Export / publish — PDF and/or live link ready to share</div>
+          <div class="task-sub">A portfolio that can't be sent doesn't exist.</div>
+        </div>
+        <span class="task-tag tag-finish">done</span>
+      </div>
+      <div class="task" onclick="toggle(this)">
+        <div class="task-box">✓</div>
+        <div class="task-body">
+          <div class="task-text">Send it to bf. Done. He sees it. That's the milestone.</div>
+          <div class="task-sub">Not for his approval — as proof to yourself that it's real.</div>
+        </div>
+        <span class="task-tag tag-finish">done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOUNTABILITY -->
+  <div class="accountability">
+    <div class="acc-title">How he stays in it — without managing it</div>
+    <div class="acc-rule">
+      <span class="acc-when">You → him</span>
+      <span class="acc-what">Every Sunday, you send <strong>one sentence</strong>. What you finished that week. He receives it. That's it.</span>
+    </div>
+    <div class="acc-rule">
+      <span class="acc-when">Milestones</span>
+      <span class="acc-what">4 real moments to share: <strong>audit done, all assets built, full draft exists, portfolio live.</strong> These are celebrations, not check-ins.</span>
+    </div>
+    <div class="acc-rule">
+      <span class="acc-when">His role</span>
+      <span class="acc-what">Witness, not manager. He knows the plan. He sees the milestones. He doesn't ask — <strong>you tell him</strong>.</span>
+    </div>
+  </div>
+
+  <!-- OVERALL PROGRESS -->
+  <div class="overall-progress">
+    <div class="op-label">
+      <span>Overall sprint progress</span>
+      <span id="progressText">0 / 15 tasks</span>
+    </div>
+    <div class="op-bar">
+      <div class="op-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Project tracker
+  const projects = Array.from({length: 5}, (_, i) => ({name: '', stage: 0}));
+
+  function renderProjects() {
+    const list = document.getElementById('projectList');
+    list.innerHTML = projects.map((p, i) => `
+      <div class="project-row">
+        <span class="project-num">0${i+1}</span>
+        <input class="project-name-input" placeholder="Project name..." value="${p.name}"
+          oninput="projects[${i}].name = this.value" />
+        <div class="project-status">
+          ${[0,1,2,3].map(s => `
+            <div class="dot ${p.stage >= s ? 'active' : ''}" data-stage="${s}"
+              onclick="setStage(${i}, ${s})" title="${['not started','in progress','drafted','done'][s]}"></div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function setStage(pi, stage) {
+    projects[pi].stage = stage;
+    renderProjects();
+  }
+
+  renderProjects();
+
+  // Task toggles
+  function toggle(el) {
+    el.classList.toggle('done');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.task');
+    const done = document.querySelectorAll('.task.done').length;
+    const pct = Math.round((done / all.length) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = done + ' / ' + all.length + ' tasks';
+    document.getElementById('donePct').textContent = pct + '%';
+  }
+</script>
+</body>
+</html>
