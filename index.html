@@ -526,6 +526,22 @@
     </div>
   </div>
 
+ <div class="timer-section">
+  <div class="section-label">Focus Timer</div>
+  <div class="timer-presets">
+    <button class="t-preset active" onclick="setPreset(25,this)">25 min</button>
+    <button class="t-preset" onclick="setPreset(45,this)">45 min</button>
+    <button class="t-preset" onclick="setPreset(60,this)">60 min</button>
+    <button class="t-preset" onclick="setPreset(90,this)">90 min</button>
+  </div>
+  <div class="timer-display" id="timerDisplay">25:00</div>
+  <div class="timer-btns">
+    <button class="t-btn primary" id="startBtn" onclick="timerToggle()">Start</button>
+    <button class="t-btn" onclick="timerReset()">Reset</button>
+  </div>
+  <div class="timer-label" id="timerLabel">— ready</div>
+</div>
+ 
   <!-- WHAT YOU DID -->
   <div class="card">
     <div class="card-label">What you actually did</div>
@@ -627,6 +643,74 @@
     `).join('');
   }
 
+ // TIMER
+let timerInterval = null;
+let timerRunning = false;
+let timerSeconds = 25 * 60;
+let timerPresetSeconds = 25 * 60;
+let timerSessionsDone = 0;
+
+function setPreset(mins, el) {
+  if (timerRunning) return;
+  timerPresetSeconds = mins * 60;
+  timerSeconds = timerPresetSeconds;
+  document.querySelectorAll('.t-preset').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  updateTimerDisplay();
+  document.getElementById('timerLabel').textContent = '— ready';
+}
+
+function timerToggle() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('startBtn').textContent = 'Resume';
+    document.getElementById('timerDisplay').classList.remove('running');
+    document.getElementById('timerLabel').textContent = '— paused';
+  } else {
+    timerRunning = true;
+    document.getElementById('startBtn').textContent = 'Pause';
+    document.getElementById('timerDisplay').classList.add('running');
+    document.getElementById('timerLabel').textContent = '— focusing';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      updateTimerDisplay();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        timerSessionsDone++;
+        document.getElementById('startBtn').textContent = 'Start';
+        document.getElementById('timerDisplay').classList.remove('running');
+        document.getElementById('timerLabel').textContent =
+          `— done! ${timerSessionsDone} session${timerSessionsDone > 1 ? 's' : ''} today`;
+        timerSeconds = timerPresetSeconds;
+        updateTimerDisplay();
+        if (Notification.permission === 'granted') {
+          new Notification('Focus session complete ✓', { body: 'Time for a break.' });
+        }
+      }
+    }, 1000);
+  }
+}
+
+function timerReset() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = timerPresetSeconds;
+  document.getElementById('startBtn').textContent = 'Start';
+  document.getElementById('timerDisplay').classList.remove('running');
+  document.getElementById('timerLabel').textContent = '— ready';
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  document.getElementById('timerDisplay').textContent =
+    String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+if (Notification.permission === 'default') Notification.requestPermission();
   function selectProject(i) {
     selectedProject = i;
     renderProjects();
