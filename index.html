@@ -461,6 +461,21 @@
     display: block;
   }
 
+ .timer-section{margin-bottom:56px}
+.timer-display{font-family:'DM Sans',sans-serif;font-size:72px;font-weight:700;font-style:italic;letter-spacing:-4px;line-height:1;color:#f0ebe3;margin:16px 0 24px}
+.timer-display.running{color:#e05a2b}
+.timer-btns{display:flex;gap:8px;flex-wrap:wrap}
+.t-btn{background:transparent;border:1px solid #1c1c1c;color:#555;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;padding:8px 16px;transition:all 0.12s}
+.t-btn:hover{border-color:#e05a2b;color:#e05a2b}
+.t-btn.primary{border-color:#e05a2b;color:#e05a2b}
+.t-btn.primary:hover{background:#e05a2b;color:#0a0a0a}
+.timer-presets{display:flex;gap:6px;margin-bottom:16px}
+.t-preset{background:transparent;border:1px solid #181818;color:#333;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;padding:4px 10px;transition:all 0.12s}
+.t-preset:hover{border-color:#444;color:#888}
+.t-preset.active{border-color:#e05a2b;color:#e05a2b}
+.timer-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#2a2a2a;margin-top:16px
+  }
+ 
   .delete-btn:hover { color: var(--accent); }
 
   @keyframes fadeUp {
